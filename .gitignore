@@ -1,0 +1,11 @@
+Library
+Temp
+ProjectSettings
+UserSettings
+Logs
+Tutorials
+Packages
+obj
+
+*.json
+*.meta
