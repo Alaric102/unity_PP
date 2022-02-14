@@ -26,11 +26,19 @@ public class agentScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        addTarget();
-        poses[0] = transform.position;
-        List<NavMeshPath> path_list = GetPath();
+        // Update current pose in queue
+        poses[0] = transform.position; 
+
+        // Proccess user interface
+        EditPath();
+
+        // Update all pathes
+        List<NavMeshPath> path_list = GetPathes();
+
+        // Show gloabal path
         RenderPath(path_list);
 
+        // Check local goal state
         if (path_list.Count > 0){
             agent.SetPath(path_list[0]);
             if (agent.path.corners.Length < 2){
@@ -40,7 +48,8 @@ public class agentScript : MonoBehaviour
         
     }
 
-    private void addTarget(){
+    // Implementation of user interface with path planner
+    private void EditPath(){
         if (Input.GetMouseButtonDown(0)){
             Ray CameraToMouse = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hitInfo;
@@ -49,20 +58,31 @@ public class agentScript : MonoBehaviour
                 out hitInfo,  Mathf.Infinity, canBeClicked)) {
                 poses.Add(hitInfo.point);
             }
+        } else if (Input.GetMouseButtonDown(1)) {
+            Ray CameraToMouse = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+            
+            if (Physics.Raycast(CameraToMouse, 
+                out hitInfo,  Mathf.Infinity, canBeClicked)) {
+                
+            }
         }
     }
-    private List<NavMeshPath> GetPath(){
+
+    // Get list of pathes to execute
+    private List<NavMeshPath> GetPathes(){
         List<NavMeshPath> path_list = new List<NavMeshPath>();
-        
         if (poses.Count > 1){
             for (int i = 0; i < poses.Count - 1; ++i){
                 path_list.Add(new NavMeshPath());
                 NavMesh.CalculatePath(poses[i], poses[i+1], 
-                    NavMesh.AllAreas, path_list[i]);
+                    canBeClicked, path_list[i]);
             }
         }
         return path_list;
     }
+
+    // Draw line through all pathes
     private void RenderPath(List<NavMeshPath> path_list){
         int vertex_num = 0;
         foreach (var path in path_list)
@@ -79,6 +99,5 @@ public class agentScript : MonoBehaviour
                 counter++;
             }
         }
-        
     }
 }
