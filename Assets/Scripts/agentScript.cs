@@ -12,6 +12,7 @@ public class agentScript : MonoBehaviour
     private List<Vector3> target_list = new List<Vector3>();
     NavMeshAgent agent;
     LineRenderer pathRender;
+    LineRenderer secondaryPathRender;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,9 +29,15 @@ public class agentScript : MonoBehaviour
     }
 
     private void calcPathes(){
-        for (int i = 1; i < target_list.Count; ++i){
-            
+        Debug.Log("target_list.Count:" + target_list.Count);
+        if (target_list.Count < 1){
+            return;
         }
+
+        List<NavMeshPath> pathes = new List<NavMeshPath>(target_list.Count);
+        // for (int i = 1; i < target_list.Count - 1; ++i){
+        //     NavMesh.CalculatePath(target_list[i], target_list[i+1], NavMesh.AllAreas, pathes[i-1]);
+        // }
     }
     private void addTarget(){
         if (Input.GetMouseButtonDown(0)){
