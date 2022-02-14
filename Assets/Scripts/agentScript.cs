@@ -9,7 +9,7 @@ public class agentScript : MonoBehaviour
     
     public int corners;
     
-    private List<Vector3> target_list = new List<Vector3>();
+    List<Vector3> poses = new List<Vector3>();
     NavMeshAgent agent;
     LineRenderer pathRender;
     LineRenderer secondaryPathRender;
@@ -18,27 +18,28 @@ public class agentScript : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         pathRender = GetComponent<LineRenderer>();
+        pathRender.positionCount = 0;
+        poses.Add(transform.position);
+        
     }
 
     // Update is called once per frame
     void Update()
     {
         addTarget();
-        getPath(agent);
-        calcPathes();
-    }
+        poses[0] = transform.position;
+        List<NavMeshPath> path_list = GetPath();
+        RenderPath(path_list);
 
-    private void calcPathes(){
-        Debug.Log("target_list.Count:" + target_list.Count);
-        if (target_list.Count < 1){
-            return;
+        if (path_list.Count > 0){
+            agent.SetPath(path_list[0]);
+            if (agent.path.corners.Length < 2){
+                poses.RemoveAt(1);
+            }
         }
-
-        List<NavMeshPath> pathes = new List<NavMeshPath>(target_list.Count);
-        // for (int i = 1; i < target_list.Count - 1; ++i){
-        //     NavMesh.CalculatePath(target_list[i], target_list[i+1], NavMesh.AllAreas, pathes[i-1]);
-        // }
+        
     }
+
     private void addTarget(){
         if (Input.GetMouseButtonDown(0)){
             Ray CameraToMouse = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -46,19 +47,38 @@ public class agentScript : MonoBehaviour
             
             if (Physics.Raycast(CameraToMouse, 
                 out hitInfo,  Mathf.Infinity, canBeClicked)) {
-                target_list.Add(hitInfo.point);
+                poses.Add(hitInfo.point);
             }
         }
     }
-    private void getPath(NavMeshAgent agent){
-        if (agent.path.corners.Length > 1){
-            pathRender.positionCount = agent.path.corners.Length;
-            for (int i = 0; i < agent.path.corners.Length; ++i){
-                pathRender.SetPosition(i, agent.path.corners[i]);
+    private List<NavMeshPath> GetPath(){
+        List<NavMeshPath> path_list = new List<NavMeshPath>();
+        
+        if (poses.Count > 1){
+            for (int i = 0; i < poses.Count - 1; ++i){
+                path_list.Add(new NavMeshPath());
+                NavMesh.CalculatePath(poses[i], poses[i+1], 
+                    NavMesh.AllAreas, path_list[i]);
             }
-        } else if (target_list.Count > 0){
-            agent.SetDestination(target_list[0]);
-            target_list.RemoveAt(0);
         }
+        return path_list;
+    }
+    private void RenderPath(List<NavMeshPath> path_list){
+        int vertex_num = 0;
+        foreach (var path in path_list)
+            vertex_num += path.corners.Length;
+
+        if (vertex_num == 0)
+            return;
+
+        pathRender.positionCount = vertex_num;
+        int counter = 0;
+        foreach (var path in path_list){
+            foreach (var corner in path.corners){
+                pathRender.SetPosition(counter, corner);
+                counter++;
+            }
+        }
+        
     }
 }
