@@ -6,13 +6,10 @@ using UnityEngine;
 public class agentScript : MonoBehaviour
 {
     public LayerMask canBeClicked;
+    private List<Vector3> poses = new List<Vector3>();
+    private NavMeshAgent agent;
+    private LineRenderer pathRender;
     
-    public int corners;
-    
-    List<Vector3> poses = new List<Vector3>();
-    NavMeshAgent agent;
-    LineRenderer pathRender;
-    LineRenderer secondaryPathRender;
     // Start is called before the first frame update
     void Start()
     {
