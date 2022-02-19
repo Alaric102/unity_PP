@@ -21,7 +21,7 @@ send_dict.setdefault('Wood', [0.0, 0.0, 0.0])
 send_dict.setdefault('Other', [0.0, 0.0, 0.0])
 
 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-conn.connect(('10.30.33.12', 12345))
+conn.connect(('10.16.112.72', 12345))
 send_data(conn, send_dict)
 
 at_detector = Detector(families='tag36h11',
