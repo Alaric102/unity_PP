@@ -74,7 +74,8 @@ if __name__ == '__main__':
         greys = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         tags = at_detector.detect(greys, estimate_tag_pose=True, camera_params=camera_params, tag_size=0.167)
         print(tags)
-
+        
+        message_tosend = ""
         if tags:
             for tag in tags:
                 for idx in range(len(tag.corners)):
@@ -86,40 +87,47 @@ if __name__ == '__main__':
                             fontScale=0.8,
                             color=(0, 0, 255))
 
-                if tag.tag_id == 0:
-                    print('Box: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
-                    send_dict['Box'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
-                    send_data(conn, send_dict)
+                # if tag.tag_id == 0:
+                #     print('Box: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
+                #     send_dict['Box'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
+                #     send_data(conn, send_dict)
 
-                elif tag.tag_id == 1:
-                    print('Office_chair: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
-                    send_dict['Office_chair'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
-                    send_data(conn, send_dict)
+                # elif tag.tag_id == 1:
+                #     print('Office_chair: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
+                #     send_dict['Office_chair'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
+                #     send_data(conn, send_dict)
                     
-                elif tag.tag_id == 2:
-                    print('Soccer_ball: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
-                    send_dict['Soccer_ball'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
-                    send_data(conn, send_dict)
+                # elif tag.tag_id == 2:
+                #     print('Soccer_ball: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
+                #     send_dict['Soccer_ball'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
+                #     send_data(conn, send_dict)
                 
-                elif tag.tag_id == 3:
-                    print('Wood: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
-                    send_dict['Wood'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
-                    send_data(conn, send_dict)
+                # elif tag.tag_id == 3:
+                #     print('Wood: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
+                #     send_dict['Wood'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
+                #     send_data(conn, send_dict)
                 
-                elif tag.tag_id == 4:
-                    print('Other: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
-                    send_dict['Other'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
-                    send_data(conn, send_dict)
+                # elif tag.tag_id == 4:
+                #     print('Other: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
+                #     send_dict['Other'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
+                #     send_data(conn, send_dict)
+                message_tosend += tag.tag_id + ','
+                message_tosend += tag.pose_t[0][0] + ','
+                message_tosend += tag.pose_t[1][0] + ','
+                message_tosend += tag.pose_t[2][0]
 
         else:
             print("No tags")
-            send_dict['Box'] = [0.0, 0.0, 0.0]
-            send_dict['Office_chair'] = [0.0, 0.0, 0.0]
-            send_dict['Soccer_ball'] = [0.0, 0.0, 0.0]
-            send_dict['Wood'] = [0.0, 0.0, 0.0]
-            send_dict['Other'] = [0.0, 0.0, 0.0]
-            send_data(conn, send_dict)
-
+            # send_dict['Box'] = [0.0, 0.0, 0.0]
+            # send_dict['Office_chair'] = [0.0, 0.0, 0.0]
+            # send_dict['Soccer_ball'] = [0.0, 0.0, 0.0]
+            # send_dict['Wood'] = [0.0, 0.0, 0.0]
+            # send_dict['Other'] = [0.0, 0.0, 0.0]
+            # send_data(conn, send_dict)
+            
+            message_tosend = "-1"
+        
+        send_data(conn, message_tosend)
         
         cv2.imshow('One', img)
     cv2.destroyAllWindows()
