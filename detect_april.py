@@ -11,17 +11,11 @@ import struct
 
 def send_data(conn, payload, data_id=0):
    # serialized_payload = pickle.dumps(payload)
-    conn.sendall(payload.encode())
-
-send_dict = {}
-send_dict.setdefault('Box', [0.0, 0.0, 0.0])
-send_dict.setdefault('Office_chair', [0.0, 0.0, 0.0])
-send_dict.setdefault('Soccer_ball', [0.0, 0.0, 0.0])
-send_dict.setdefault('Wood', [0.0, 0.0, 0.0])
-send_dict.setdefault('Other', [0.0, 0.0, 0.0])
+    conn.sendto(payload.encode(), ("10.16.112.72", 12345))
 
 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 conn.connect(('10.16.112.72', 12345))
+
 #send_data(conn, send_dict)
 
 at_detector = Detector(families='tag36h11',
@@ -65,6 +59,7 @@ config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 if __name__ == '__main__':
     pipeline.start(config)
     while cv2.waitKey(1) != 0x1b:
+        message_tosend = None
         frames = pipeline.wait_for_frames()
         # depth_frame = frames.get_depth_frame()
         color_frame = frames.get_color_frame()
@@ -115,7 +110,7 @@ if __name__ == '__main__':
                 message_tosend += str(tag.pose_t[0][0]) + ','
                 message_tosend += str(tag.pose_t[1][0]) + ','
                 message_tosend += str(tag.pose_t[2][0])
-                send(conn, message_tosend)
+                send_data(conn, message_tosend)
 
         else:
             #print("No tags")
@@ -126,7 +121,7 @@ if __name__ == '__main__':
             # send_dict['Other'] = [0.0, 0.0, 0.0]
             #send_data(conn, send_dict)
             message_tosend = "-1"
-            send(conn, message_tosend)
+            send_data(conn, message_tosend)
 
         print(message_tosend)
        # send_data(conn, message_tosend)
