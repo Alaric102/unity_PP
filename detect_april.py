@@ -1,5 +1,5 @@
 from dt_apriltags import Detector
-import pyrealsense2 as rs
+import pyrealsense2.pyrealsense2 as rs
 import numpy as np
 import cv2
 import math
@@ -10,8 +10,8 @@ import pickle
 import struct
 
 def send_data(conn, payload, data_id=0):
-    serialized_payload = pickle.dumps(payload)
-    conn.sendall(serialized_payload)
+   # serialized_payload = pickle.dumps(payload)
+    conn.sendall(payload.encode())
 
 send_dict = {}
 send_dict.setdefault('Box', [0.0, 0.0, 0.0])
@@ -22,7 +22,7 @@ send_dict.setdefault('Other', [0.0, 0.0, 0.0])
 
 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 conn.connect(('10.16.112.72', 12345))
-send_data(conn, send_dict)
+#send_data(conn, send_dict)
 
 at_detector = Detector(families='tag36h11',
                        nthreads=1,
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         img = np.asanyarray(color_frame.get_data())
         greys = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         tags = at_detector.detect(greys, estimate_tag_pose=True, camera_params=camera_params, tag_size=0.167)
-        print(tags)
+        #print(tags)
         
         message_tosend = ""
         if tags:
@@ -111,23 +111,28 @@ if __name__ == '__main__':
                 #     print('Other: ', tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0])
                 #     send_dict['Other'] = [tag.pose_t[0][0], tag.pose_t[1][0], tag.pose_t[2][0]]
                 #     send_data(conn, send_dict)
-                message_tosend += tag.tag_id + ','
-                message_tosend += tag.pose_t[0][0] + ','
-                message_tosend += tag.pose_t[1][0] + ','
-                message_tosend += tag.pose_t[2][0]
+                message_tosend += str(tag.tag_id) + ','
+                message_tosend += str(tag.pose_t[0][0]) + ','
+                message_tosend += str(tag.pose_t[1][0]) + ','
+                message_tosend += str(tag.pose_t[2][0])
+		
+		send(conn, message_tosend)
 
         else:
-            print("No tags")
+            #print("No tags")
             # send_dict['Box'] = [0.0, 0.0, 0.0]
             # send_dict['Office_chair'] = [0.0, 0.0, 0.0]
             # send_dict['Soccer_ball'] = [0.0, 0.0, 0.0]
             # send_dict['Wood'] = [0.0, 0.0, 0.0]
             # send_dict['Other'] = [0.0, 0.0, 0.0]
-            # send_data(conn, send_dict)
+            #send_data(conn, send_dict)
             
-            message_tosend = "-1"
+		message_tosend = "-1"
+		send(conn, message_tosend)
+
+        print(message_tosend)
+       # send_data(conn, message_tosend)
         
-        send_data(conn, message_tosend)
-        
+
         cv2.imshow('One', img)
     cv2.destroyAllWindows()
