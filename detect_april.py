@@ -120,7 +120,7 @@ if __name__ == '__main__':
             # send_dict['Wood'] = [0.0, 0.0, 0.0]
             # send_dict['Other'] = [0.0, 0.0, 0.0]
             #send_data(conn, send_dict)
-            message_tosend = "-1"
+            message_tosend = "-1,"
             send_data(conn, message_tosend)
 
         print(message_tosend)
