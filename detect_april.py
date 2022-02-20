@@ -115,8 +115,7 @@ if __name__ == '__main__':
                 message_tosend += str(tag.pose_t[0][0]) + ','
                 message_tosend += str(tag.pose_t[1][0]) + ','
                 message_tosend += str(tag.pose_t[2][0])
-		
-		send(conn, message_tosend)
+                send(conn, message_tosend)
 
         else:
             #print("No tags")
@@ -126,9 +125,8 @@ if __name__ == '__main__':
             # send_dict['Wood'] = [0.0, 0.0, 0.0]
             # send_dict['Other'] = [0.0, 0.0, 0.0]
             #send_data(conn, send_dict)
-            
-		message_tosend = "-1"
-		send(conn, message_tosend)
+            message_tosend = "-1"
+            send(conn, message_tosend)
 
         print(message_tosend)
        # send_data(conn, message_tosend)
